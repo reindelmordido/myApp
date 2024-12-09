@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CRUD App</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vuetify@2.6.10/dist/vuetify.js"></script>
+        <style>
+            body {
+                font-family: "Roboto", sans-serif;
+            }
+            .container {
+                max-width: 900px;
+                margin: 50px auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <v-app>
+                <v-container>
+                    <v-row>
+                        <v-col>
+                            <v-btn
+                                color="primary"
+                                dark
+                                @click="showCreateDialog = true"
+                            >
+                                <v-icon left>mdi-plus</v-icon>Add Task
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+
+                    <!-- Create Task Dialog -->
+                    <v-dialog v-model="showCreateDialog" max-width="500">
+                        <v-card>
+                            <v-card-title>
+                                <span class="text-h5">Add New Task</span>
+                            </v-card-title>
+                            <v-card-text>
+                                <v-form>
+                                    <v-text-field
+                                        v-model="newTask.title"
+                                        label="Title"
+                                        outlined
+                                    ></v-text-field>
+                                    <v-textarea
+                                        v-model="newTask.description"
+                                        label="Description"
+                                        outlined
+                                    ></v-textarea>
+                                </v-form>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn text color="primary" @click="addTask"
+                                    >Save</v-btn
+                                >
+                                <v-btn
+                                    text
+                                    color="secondary"
+                                    @click="showCreateDialog = false"
+                                    >Cancel</v-btn
+                                >
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+
+                    <!-- Task List -->
+                    <v-row>
+                        <v-col
+                            v-for="(task, index) in tasks"
+                            :key="index"
+                            cols="12"
+                            sm="6"
+                            md="4"
+                        >
+                            <v-card>
+                                <v-card-title>{{ task.title }}</v-card-title>
+                                <v-card-text
+                                    >{{ task.description }}</v-card-text
+                                >
+                                <v-card-actions>
+                                    <v-btn
+                                        text
+                                        color="primary"
+                                        @click="editTask(index)"
+                                        >Edit</v-btn
+                                    >
+                                    <v-btn
+                                        text
+                                        color="error"
+                                        @click="deleteTask(index)"
+                                        >Delete</v-btn
+                                    >
+                                </v-card-actions>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+
+                    <!-- Edit Task Dialog -->
+                    <v-dialog v-model="showEditDialog" max-width="500">
+                        <v-card>
+                            <v-card-title>Edit Task</v-card-title>
+                            <v-card-text>
+                                <v-text-field
+                                    v-model="currentTask.title"
+                                    label="Title"
+                                    outlined
+                                ></v-text-field>
+                                <v-textarea
+                                    v-model="currentTask.description"
+                                    label="Description"
+                                    outlined
+                                ></v-textarea>
+                            </v-card-text>
+                            <v-card-actions>
+                                <v-btn text color="primary" @click="updateTask"
+                                    >Save</v-btn
+                                >
+                                <v-btn
+                                    text
+                                    color="secondary"
+                                    @click="showEditDialog = false"
+                                    >Cancel</v-btn
+                                >
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-container>
+            </v-app>
+        </div>
+
+        <script>
+            new Vue({
+                el: "#app",
+                vuetify: new Vuetify(),
+                data() {
+                    return {
+                        tasks: [
+                            {
+                                title: "Sample Task 1",
+                                description: "Description for task 1",
+                            },
+                            {
+                                title: "Sample Task 2",
+                                description: "Description for task 2",
+                            },
+                        ],
+                        newTask: { title: "", description: "" },
+                        currentTask: { title: "", description: "" },
+                        showCreateDialog: false,
+                        showEditDialog: false,
+                        editIndex: -1,
+                    };
+                },
+                methods: {
+                    addTask() {
+                        if (this.newTask.title && this.newTask.description) {
+                            this.tasks.push({ ...this.newTask });
+                            this.newTask = { title: "", description: "" };
+                            this.showCreateDialog = false;
+                        }
+                    },
+                    editTask(index) {
+                        this.editIndex = index;
+                        this.currentTask = { ...this.tasks[index] };
+                        this.showEditDialog = true;
+                    },
+                    updateTask() {
+                        if (this.editIndex > -1) {
+                            this.$set(this.tasks, this.editIndex, {
+                                ...this.currentTask,
+                            });
+                            this.showEditDialog = false;
+                            this.currentTask = { title: "", description: "" };
+                        }
+                    },
+                    deleteTask(index) {
+                        this.tasks.splice(index, 1);
+                    },
+                },
+            });
+        </script>
+    </body>
+</html>
